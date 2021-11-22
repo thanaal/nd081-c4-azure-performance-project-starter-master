@@ -143,3 +143,4 @@ if __name__ == "__main__":
     # app.run() # local
     # uncomment the line below before deployment to VMSS
     app.run(host='0.0.0.0', threaded=True, debug=True) # remote
+    
