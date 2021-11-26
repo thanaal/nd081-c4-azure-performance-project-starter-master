@@ -10,12 +10,14 @@ from datetime import datetime
 # App Insights
 # TODO: Import required libraries for App Insights
 from opencensus.ext.azure.log_exporter import AzureLogHandler
+from opencensus.ext.azure.log_exporter import AzureEventHandler
 from opencensus.ext.azure import metrics_exporter
 from opencensus.stats import aggregation as aggregation_module
 from opencensus.stats import measure as measure_module
 from opencensus.stats import stats as stats_module
 from opencensus.stats import view as view_module
 from opencensus.tags import tag_map as tag_map_module
+from opencensus.trace import config_integration
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.tracer import Tracer
@@ -24,11 +26,8 @@ from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 # For metrics
 stats = stats_module.stats
 view_manager = stats.view_manager
-app = Flask(__name__)
-# Load configurations from environment or config file
-app.config.from_pyfile('config_file.cfg')
-inst_key = 'InstrumentationKey=f5aa29d6-f564-4ca2-b477-1c6956ff22a0;IngestionEndpoint=https://westus-0.in.applicationinsights.azure.com/'
 
+inst_key = 'InstrumentationKey=f5aa29d6-f564-4ca2-b477-1c6956ff22a0;IngestionEndpoint=https://westus-0.in.applicationinsights.azure.com/'
 
 # Logging
 config_integration.trace_integrations(['logging'])
@@ -59,6 +58,7 @@ tracer = Tracer(
 
 logger.info("tracer set up successfully")
 
+app = Flask(__name__)
 
 # Requests
 middleware = FlaskMiddleware(
@@ -69,6 +69,8 @@ middleware = FlaskMiddleware(
 logger.info("requests set up successfully")
 logger.warning("**********setup completed**********")
 
+# Load configurations from environment or config file
+app.config.from_pyfile('config_file.cfg')
 
 if ("VOTE1VALUE" in os.environ and os.environ['VOTE1VALUE']):
     button1 = os.environ['VOTE1VALUE']
