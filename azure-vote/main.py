@@ -27,7 +27,7 @@ view_manager = stats.view_manager
 app = Flask(__name__)
 # Load configurations from environment or config file
 app.config.from_pyfile('config_file.cfg')
-inst_key = 'InstrumentationKey=f5aa29d6-f564-4ca2-b477-1c6956ff22a0'
+inst_key = 'InstrumentationKey=f5aa29d6-f564-4ca2-b477-1c6956ff22a0;IngestionEndpoint=https://westus-0.in.applicationinsights.azure.com/'
 
 
 # Logging
