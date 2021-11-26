@@ -24,7 +24,7 @@ from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 # For metrics
 stats = stats_module.stats
 view_manager = stats.view_manager
-
+app = Flask(__name__)
 # Load configurations from environment or config file
 app.config.from_pyfile('config_file.cfg')
 inst_key = app.config['APP_INSIGHTS_INSTRUMENTATION_KEY']
@@ -50,7 +50,7 @@ tracer = Tracer(
         connection_string=inst_key),
         sampler=ProbabilitySampler(1.0),
 )# TODO: Setup tracer
-app = Flask(__name__)
+
 logger.info("tracer set up successfully")
 
 
