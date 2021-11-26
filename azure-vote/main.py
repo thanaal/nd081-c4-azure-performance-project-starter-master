@@ -39,15 +39,18 @@ handler.setFormatter(logging.Formatter('%(traceId)s %(spanId)s %(message)s'))
 logger.addHandler(handler)
 logger.addHandler(AzureEventHandler(connection_string=inst_key)) #custom events
 logger.setLevel(logging.INFO) #set the logging level
-logger.info("logger set up successfully")
-logger.info("app_insights_instrumentation_key = {}".format(inst_key)) # TODO: Setup logger
+# logger.info("logger set up successfully")
+# logger.info("app_insights_instrumentation_key = {}".format(inst_key)) 
+print("logger set up successfully")
+print("app_insights_instrumentation_key = {}".format(inst_key))# TODO: Setup logger
 
 # Metrics
 exporter = metrics_exporter.new_metrics_exporter(
     enable_standard_metrics=True,
     connection_string=inst_key) # TODO: Setup exporter
 view_manager.register_exporter(exporter)
-logger.info("metrics set up successfully")
+# logger.info("metrics set up successfully")
+print("metrics set up successfully")
 
 # Tracing
 tracer = Tracer(
@@ -56,7 +59,8 @@ tracer = Tracer(
         sampler=ProbabilitySampler(1.0),
 )# TODO: Setup tracer
 
-logger.info("tracer set up successfully")
+# logger.info("tracer set up successfully")
+print("tracer set up successfully")
 
 app = Flask(__name__)
 
@@ -66,8 +70,10 @@ middleware = FlaskMiddleware(
  exporter=AzureExporter(connection_string=inst_key),
  sampler=ProbabilitySampler(rate=1.0)
 )# TODO: Setup flask middleware
-logger.info("requests set up successfully")
-logger.warning("**********setup completed**********")
+# logger.info("requests set up successfully")
+# logger.warning("**********setup completed**********")
+print("requests set up successfully")
+print("**********setup completed**********")
 
 # Load configurations from environment or config file
 app.config.from_pyfile('config_file.cfg')
@@ -106,12 +112,12 @@ def index():
         # Get current values
         vote1 = r.get(button1).decode('utf-8')
         # TODO: use tracer object to trace cat vote
-        with tracer.span(name="Voted Cats") as span:
-            print("CVoted Cats")
+        with tracer.span(name="Voted Cat") as span:
+            print("Voted Cat")
         vote2 = r.get(button2).decode('utf-8')
         # TODO: use tracer object to trace dog vote
-        with tracer.span(name="Voted Dogs") as span:
-            print("CVoted Dogs")
+        with tracer.span(name="Voted Dog") as span:
+            print("Voted Dog")
 
         # Return index with values
         return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
