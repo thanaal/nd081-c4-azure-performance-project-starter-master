@@ -31,11 +31,17 @@ inst_key = 'InstrumentationKey=f5aa29d6-f564-4ca2-b477-1c6956ff22a0;IngestionEnd
 
 
 # Logging
-logger = logging.getLogger(__name__) # TODO: Setup logger
-logger.addHandler(AzureLogHandler(connection_string=inst_key))
+config_integration.trace_integrations(['logging'])
+config_integration.trace_integrations(['requests'])
+# Standard Logging
+logger = logging.getLogger(__name__) 
+handler = AzureLogHandler(connection_string=inst_key)
+handler.setFormatter(logging.Formatter('%(traceId)s %(spanId)s %(message)s'))
+logger.addHandler(handler)
+logger.addHandler(AzureEventHandler(connection_string=inst_key)) #custom events
 logger.setLevel(logging.INFO) #set the logging level
 logger.info("logger set up successfully")
-logger.info("app_insights_instrumentation_key = {}".format(inst_key))
+logger.info("app_insights_instrumentation_key = {}".format(inst_key)) # TODO: Setup logger
 
 # Metrics
 exporter = metrics_exporter.new_metrics_exporter(
@@ -98,10 +104,12 @@ def index():
         # Get current values
         vote1 = r.get(button1).decode('utf-8')
         # TODO: use tracer object to trace cat vote
-        tracer.span(name="Voted Cats")
+        with tracer.span(name="Voted Cats") as span:
+            print("CVoted Cats")
         vote2 = r.get(button2).decode('utf-8')
         # TODO: use tracer object to trace dog vote
-        tracer.span(name="Voted Dogs")
+        with tracer.span(name="Voted Dogs") as span:
+            print("CVoted Dogs")
 
         # Return index with values
         return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
@@ -114,12 +122,12 @@ def index():
             r.set(button1,0)
             r.set(button2,0)
             vote1 = r.get(button1).decode('utf-8')
-            properties = {'custom_dimensions': {'Cats Vote': vote1}}
+            properties = {'custom_dimensions': {'Cats': vote1}}
             # TODO: use logger object to log cat vote
-            logger.warning('Cats', extra=properties)
+            logger.info('Cats', extra=properties)
 
             vote2 = r.get(button2).decode('utf-8')
-            properties = {'custom_dimensions': {'Dogs Vote': vote2}}
+            properties = {'custom_dimensions': {'Dogs': vote2}}
             # TODO: use logger object to log dog vote
             logger.warning('Dogs', extra=properties)
 
@@ -133,7 +141,13 @@ def index():
 
             # Get current values
             vote1 = r.get(button1).decode('utf-8')
+            properties = {'custom_dimensions': {'Cats': vote1}}
+            # TODO: use logger object to log cat vote
+            logger.info('Cats', extra=properties)
             vote2 = r.get(button2).decode('utf-8')
+            properties = {'custom_dimensions': {'Dogs': vote2}}
+            # TODO: use logger object to log dog vote
+            logger.warning('Dogs', extra=properties)
 
             # Return results
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
